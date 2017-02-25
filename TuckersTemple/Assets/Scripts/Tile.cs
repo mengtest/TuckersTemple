@@ -23,6 +23,34 @@ public class Tile : MonoBehaviour {
     private Vector2 goalPos;
 	private Vector2 wrapPos;
     private GameMaster gm;
+
+    //called upon start, causes the tile to slide in
+    private void Start()
+    {
+        GameMaster gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameMaster>();
+        float offset = gm.tileSize * gm.numCols;
+        //save position
+        Vector2 pos = transform.position;
+
+        //check if its in an even or odd row
+        if(Mathf.FloorToInt(pos.y / gm.tileSize) % 2 == 0)
+        {
+            //set the tile's starting position
+            transform.position = new Vector2(pos.x - offset, pos.y);
+
+            //slide the tile into place
+            SlideTo(new Vector2(offset, 0));
+        }
+        else
+        {
+            //set the tile's starting position
+            transform.position = new Vector2(pos.x + offset, pos.y);
+
+            //slide the tile into place
+            SlideTo(new Vector2(-offset, 0));
+        }
+        SoundController.instance.RandomSfx(gm.TileSlide1, gm.TileSlide2);
+    }
 	
 	// Update is called once per frame
 	void Update () {
