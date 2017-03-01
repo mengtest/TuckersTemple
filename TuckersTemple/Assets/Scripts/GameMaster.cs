@@ -333,9 +333,11 @@ public class GameMaster : MonoBehaviour
     }
 	
     public GameObject spawnActor(GameObject actor, int x, int y, int direction)
-    {
-        return Instantiate(actor, new Vector3(tileGrid[x][y].transform.position.x, tileGrid[x][y].transform.position.y, tileGrid[x][y].transform.position.z), Quaternion.identity, tileGrid[x][y].transform);
-    }
+    {		
+        GameObject newActor = Instantiate(actor, new Vector3(tileGrid[x][y].transform.position.x, tileGrid[x][y].transform.position.y, tileGrid[x][y].transform.position.z), Quaternion.identity, tileGrid[x][y].transform);
+		newActor.GetComponent<Actor> ().setDirection (direction);
+		return newActor;
+	}
 
 	// remove an actor once they're dead
 	public void deleteActor(GameObject actor)
@@ -437,6 +439,7 @@ public class GameMaster : MonoBehaviour
 				// pass the tile object the type indicator string where it will
 				// create a tile based on that string
 				tileGrid [c] [r].SendMessage ("setTile", currentTileType);
+				tileGrid [c] [r].GetComponent<Tile> ().SlideIn ();
 			}
 		}
 		

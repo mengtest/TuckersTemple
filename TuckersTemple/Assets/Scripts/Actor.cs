@@ -29,6 +29,7 @@ public class Actor : MonoBehaviour {
 
 	// private fields:
 	private bool isWalking;
+	public bool isFalling;
     private bool death;
     private bool foundWall;
     private bool escaped;
@@ -44,21 +45,32 @@ public class Actor : MonoBehaviour {
         gm = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameMaster>();
         // get a reference to this actor's sprite renderer.
         sr = GetComponent<SpriteRenderer>();
+		sr.enabled = false;
 		// extract initial direction from lvl file
-		direction = 0; 
+		direction = 0;
+		sr.sprite = downSprite;
         goalPos = transform.position;
         isWalking = false;
+		isFalling = false;
         death = false;
         foundWall = false;
         escaped = false;
 	}
+		
 	
 	// Actor Update
 	void Update() {
+		if (isFalling) {
+			transform.position = Vector2.MoveTowards(transform.position, goalPos, speed);
+			if (goalPos.x == transform.position.x && goalPos.y == transform.position.y) {
+				isFalling = false;
+			}
+			return;
+		}
         // check for characters turn to walk
         if (isWalking)
         {
-		SoundController.instance.RandomSfx (playerfootsteps1, playerfootsteps2);
+			SoundController.instance.RandomSfx (playerfootsteps1, playerfootsteps2);
             if(goalPos.x == transform.position.x && goalPos.y == transform.position.y)
             {
                 // print(goalPos); debugging
@@ -103,6 +115,25 @@ public class Actor : MonoBehaviour {
         }
 	}
 
+	public void setDirection(int dir){
+		direction = dir;
+		return;
+		switch (dir) {
+			case 0:
+				sr.sprite = upSprite;
+				break;
+			case 1:
+				sr.sprite = rightSprite;
+				break;
+			case 2:
+				sr.sprite = downSprite;
+				break;
+			case 3:
+				sr.sprite = leftSprite;
+				break;
+		}
+	}
+
 	// walk to new tile
 	public void walk(){
         int directionToWalk = findNextMove(direction);
@@ -145,6 +176,14 @@ public class Actor : MonoBehaviour {
         goalPos = new Vector2(pos.x + transform.position.x, pos.y + transform.position.y);
         isWalking = true;
     }
+
+	public void FallIn()
+	{
+		goalPos = transform.parent.position;
+		transform.position = new Vector2(transform.position.x, transform.position.y + (gm.tileSize * gm.numRows)*2);
+		isFalling = true;
+		sr.enabled = true;
+	}
 
     //take in direction for actor to move
     //returns 0,1,2,3 for which direction they should move
