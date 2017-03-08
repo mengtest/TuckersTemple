@@ -130,8 +130,18 @@ public class GameMaster : MonoBehaviour
                 //tell all characters to walk
                 foreach(GameObject actor in actors)
                 {
-                    actor.GetComponent<Actor>().walk();
-					//actor.GetComponent<Enemy>().walk();
+                    actor.GetComponent<Actor>().findNextMove(actor.GetComponent<Actor>().direction);
+                }
+                foreach (GameObject actor in actors)
+                {
+                    if(actor.GetComponent<Actor>().currDirection != -1)
+                    {
+                        actor.GetComponent<Actor>().checkCollide(actor.GetComponent<Actor>().currDirection);
+                    }
+                }
+                foreach (GameObject actor in actors)
+                {
+                    actor.GetComponent<Actor>().walk(actor.GetComponent<Actor>().currDirection);
                 }
             }   
         }
