@@ -16,9 +16,11 @@ public class ZombiePasser : MonoBehaviour {
 
 	// private:
 	private int levelNum = 1;
-	private bool musicToggle = true;
-	private bool sfxToggle = true;
-	private bool vibToggle = true;
+
+	// these will store the settings save data
+	private bool musicToggle;
+	private bool sfxToggle;
+	private bool vibToggle;
 
 	// Use this for initialization
 	void Start () {

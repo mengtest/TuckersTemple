@@ -1,8 +1,7 @@
-﻿/* Menu.cs 
+﻿/* MainMenuManager.cs 
  * 
  * Contains functions applicable for the the main
- * menu, death screen, title screen, setting scene,
- * etc.
+ * menu
  * 
  */
 
@@ -10,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MainMenuManager : MonoBehaviour {
 
@@ -17,7 +17,7 @@ public class MainMenuManager : MonoBehaviour {
 	public GameObject ani;
 	public GameObject panel;
 
-	// audio
+	// audio:
 	public AudioClip MenuSlide;
 	public AudioClip PlayStart;
 
@@ -31,6 +31,19 @@ public class MainMenuManager : MonoBehaviour {
 		anim = ani.GetComponent<Animator>();
 		pan = panel.GetComponent<RectTransform> ();
 		anim.enabled = false;
+
+		//setup settings:
+		try {
+			Toggle music = GameObject.Find("MusicToggle").GetComponent<Toggle>();
+			music.isOn = GameObject.FindGameObjectWithTag("Zombie").GetComponent<ZombiePasser>().getMusicToggle();
+
+			Toggle sfx = GameObject.Find("SFXToggle").GetComponent<Toggle>();
+			sfx.isOn = GameObject.FindGameObjectWithTag("Zombie").GetComponent<ZombiePasser>().getSFXToggle();
+
+			Toggle vibration = GameObject.Find("VibToggle").GetComponent<Toggle>();
+			vibration.isOn = GameObject.FindGameObjectWithTag("Zombie").GetComponent<ZombiePasser>().getVibToggle();
+
+		} catch(System.Exception){}
 	}
 
 	// We might have something
@@ -44,6 +57,18 @@ public class MainMenuManager : MonoBehaviour {
 	public void updateLevelNum(int newLevelNum){
 		try {
 			GameObject.FindGameObjectWithTag("Zombie").GetComponent<ZombiePasser>().setLevel(newLevelNum);
+		} catch(System.Exception){}
+	}
+
+	public void musicToggle(){
+		try {
+			GameObject.FindGameObjectWithTag("Zombie").GetComponent<ZombiePasser>().setMusicToggle();
+		} catch(System.Exception){}
+	}
+
+	public void sfxToggle(){
+		try {
+			GameObject.FindGameObjectWithTag("Zombie").GetComponent<ZombiePasser>().setSFXToggle();
 		} catch(System.Exception){}
 	}
 
