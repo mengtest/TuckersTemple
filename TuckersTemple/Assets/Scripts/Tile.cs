@@ -26,7 +26,7 @@ public class Tile : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if(transform.position.x != goalPos.x || transform.position.y != goalPos.y)
+        /*if(transform.position.x != goalPos.x || transform.position.y != goalPos.y)
         {
             transform.position = Vector2.MoveTowards(transform.position, goalPos, speed);
             if (transform.position.x == goalPos.x && transform.position.y == goalPos.y)
@@ -39,7 +39,7 @@ public class Tile : MonoBehaviour {
                 }
                 gm.doneSliding();
             }
-        }
+        }*/
 	}
     /*
      * Slide is called by GameMaster, and moves the tile
@@ -48,13 +48,13 @@ public class Tile : MonoBehaviour {
      */
     public void SlideTo(Vector2 pos)
     {
-        goalPos = new Vector2(pos.x + transform.position.x, pos.y + transform.position.y);
+        //goalPos = new Vector2(pos.x + transform.position.x, pos.y + transform.position.y);
     }
 
     public void WrapPosition(Vector2 pos)
     {
-        wrap = true;
-        wrapPos = pos;
+        //wrap = true;
+        //wrapPos = pos;
     }
     //legacy, remove later thanks
     public int wallInDir(int dir)

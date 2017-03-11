@@ -55,6 +55,15 @@ public enum Transition
     UserSwiped,
     ReachedGoal,
     OffGrid,
+    FinishedWrap,
+	FinishedSlide,
+	NoMoves,
+	FoundMove,
+	GoalFound,
+	TrapFound,
+	EnemyFound,
+	PathFound,
+	FinishedWalk,
 }
 
 /// <summary>
@@ -66,7 +75,14 @@ public enum StateID
     NullStateID = 0, // Use this ID to represent a non-existing State in your system
     Idle,
     Moving,
-    Wrapping,    	
+    Wrapping,
+	IdleA,
+	LookA,
+	CheckA,
+	TrapDeadA,
+	EnemyDeadA,
+	WalkA,
+	WinA,
 }
 
 /// <summary>

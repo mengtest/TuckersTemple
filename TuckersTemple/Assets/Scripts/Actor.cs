@@ -218,7 +218,7 @@ public class Actor : MonoBehaviour {
     public void checkCollide(int currDir)
     {
         RaycastHit2D ray = Physics2D.Raycast(transform.position, v2Dirs[currDirection], gm.tileSize, LayerMask.GetMask("Wall"));
-        print("direction in checkcollide: " + direction);
+        //print("direction in checkcollide: " + direction);
         if (ray.collider != null && this.tag == "Player") print("this + hitTag in checkcollide: " + this.tag + " " + ray.collider.tag);
         if (ray.collider != null)
         {

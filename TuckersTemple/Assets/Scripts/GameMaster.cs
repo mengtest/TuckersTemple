@@ -41,6 +41,7 @@ public class GameMaster : MonoBehaviour
     private Vector2 lastPos = new Vector2(0,0); //holds the last position for mouse input to calculate deltaPosition
     private GameObject[][] tileGrid; // the holder for all the tiles
     private List<GameObject> playerChars = new List<GameObject>();
+    private List<GameObject> tiles = new List<GameObject>();
     private GameObject boundary;
     private bool canInputMove = true;
     private bool charsWalking = false;
@@ -117,14 +118,14 @@ public class GameMaster : MonoBehaviour
         }
         else
         {
-            //check if tiles are done moving and characters aren't walking
-            if (!tilesSliding && !charsWalking)
+            //check if tiles are done moving
+			bool doneSliding = doneSliding();
+            if (doneSliding)
             {
-                charsWalking = true;
-                //tell all characters to walk
+				//tell all characters to walk
                 foreach (GameObject actor in actors)
                 {
-                    actor.GetComponent<Actor>().findNextMove(actor.GetComponent<Actor>().direction);
+					actor.GetComponent<ActorFSM> ().doneSliding = true;
                 }
                 foreach (GameObject actor in actors)
                 {
@@ -203,7 +204,6 @@ public class GameMaster : MonoBehaviour
     {
         //Set some bools to stop players from entering another move while animations run
         canInputMove = false;
-        tilesSliding = true;
 
 		SoundController.instance.RandomSfx (TileSlide1, TileSlide2);
 
@@ -234,11 +234,14 @@ public class GameMaster : MonoBehaviour
                 for (int r = numRows - 1; r > 0; r--)
                 {
                     tileGrid[col][r] = tileGrid[col][r-1];
-                    tileGrid[col][r-1].GetComponent<Tile>().SlideTo(offset);
+                    tileGrid[col][r].GetComponent<TileFSM>().goalPos = new Vector2(offset.x + tileGrid[col][r].transform.position.x, offset.y + tileGrid[col][r].transform.position.y);
                 }
                 tileGrid[col][0] = temp;
-                tileGrid[col][0].GetComponent<Tile>().WrapPosition(new Vector2(tileSize * col,0));
-                tileGrid[col][0].GetComponent<Tile>().SlideTo(offset);
+                tileGrid[col][0].GetComponent<TileFSM>().offGrid = true;
+                tileGrid[col][0].GetComponent<TileFSM>().goalPos     = new Vector2(offset.x + tileGrid[col][0].transform.position.x, offset.y + tileGrid[col][0].transform.position.y);
+                tileGrid[col][0].GetComponent<TileFSM>().wrapPos     = new Vector2(tileSize * col, -tileSize);
+                tileGrid[col][0].GetComponent<TileFSM>().wrapGoalPos = new Vector2(tileSize * col, 0);
+
                 break;
             case S:
                 offset.y = -tileSize;
@@ -246,11 +249,13 @@ public class GameMaster : MonoBehaviour
                 for (int r = 0; r < numRows - 1; r++)
                 {
                     tileGrid[col][r] = tileGrid[col][r + 1];
-                    tileGrid[col][r].GetComponent<Tile>().SlideTo(offset);
+                    tileGrid[col][r].GetComponent<TileFSM>().goalPos = new Vector2(offset.x + tileGrid[col][r].transform.position.x, offset.y + tileGrid[col][r].transform.position.y);
                 }
                 tileGrid[col][numRows - 1] = temp;
-                tileGrid[col][numRows - 1].GetComponent<Tile>().WrapPosition(new Vector2(tileSize * col, (numRows-1)*tileSize));
-                tileGrid[col][numRows - 1].GetComponent<Tile>().SlideTo(offset);
+                tileGrid[col][numRows - 1].GetComponent<TileFSM>().offGrid = true;
+                tileGrid[col][numRows - 1].GetComponent<TileFSM>().goalPos     = new Vector2(offset.x + tileGrid[col][numRows - 1].transform.position.x, offset.y + tileGrid[col][numRows - 1].transform.position.y);
+                tileGrid[col][numRows - 1].GetComponent<TileFSM>().wrapPos     = new Vector2(tileSize * col, numRows * tileSize);
+                tileGrid[col][numRows - 1].GetComponent<TileFSM>().wrapGoalPos = new Vector2(tileSize * col, (numRows - 1) * tileSize);
                 break;
             case E:
                 offset.x = tileSize;
@@ -258,11 +263,13 @@ public class GameMaster : MonoBehaviour
                 for (int c = numCols - 1; c > 0; c--)
                 {
                     tileGrid[c][row] = tileGrid[c - 1][row];
-                    tileGrid[c - 1][row].GetComponent<Tile>().SlideTo(offset);
+                    tileGrid[c][row].GetComponent<TileFSM>().goalPos = new Vector2(offset.x + tileGrid[c][row].transform.position.x, offset.y + tileGrid[c][row].transform.position.y);
                 }
                 tileGrid[0][row] = temp;
-                tileGrid[0][row].GetComponent<Tile>().WrapPosition(new Vector2(0, tileSize * row));
-                tileGrid[0][row].GetComponent<Tile>().SlideTo(offset);
+                tileGrid[0][row].GetComponent<TileFSM>().offGrid = true;
+                tileGrid[0][row].GetComponent<TileFSM>().goalPos     = new Vector2(offset.x + tileGrid[0][row].transform.position.x, offset.y + tileGrid[0][row].transform.position.y);
+                tileGrid[0][row].GetComponent<TileFSM>().wrapPos     = new Vector2(-tileSize, tileSize * row);
+                tileGrid[0][row].GetComponent<TileFSM>().wrapGoalPos = new Vector2(0, tileSize * row);
                 break;
             case W:
                 offset.x = -tileSize;
@@ -270,11 +277,13 @@ public class GameMaster : MonoBehaviour
                 for (int c = 0; c < numCols - 1; c++)
                 {
                     tileGrid[c][row] = tileGrid[c+1][row];
-                    tileGrid[c][row].GetComponent<Tile>().SlideTo(offset);
+                    tileGrid[c][row].GetComponent<TileFSM>().goalPos = new Vector2(offset.x + tileGrid[c][row].transform.position.x, offset.y + tileGrid[c][row].transform.position.y);
                 }
                 tileGrid[numCols - 1][row] = temp;
-                tileGrid[numCols - 1][row].GetComponent<Tile>().WrapPosition(new Vector2((numCols - 1) * tileSize, tileSize * row));
-                tileGrid[numCols - 1][row].GetComponent<Tile>().SlideTo(offset);
+                tileGrid[numCols - 1][row].GetComponent<TileFSM>().offGrid = true;
+                tileGrid[numCols - 1][row].GetComponent<TileFSM>().goalPos     = new Vector2(offset.x + tileGrid[numCols - 1][row].transform.position.x, offset.y + tileGrid[numCols - 1][row].transform.position.y);
+                tileGrid[numCols - 1][row].GetComponent<TileFSM>().wrapPos     = new Vector2(numCols * tileSize, row * tileSize);
+                tileGrid[numCols - 1][row].GetComponent<TileFSM>().wrapGoalPos = new Vector2((numCols - 1) * tileSize, row * tileSize);
                 break;
         }
     }
@@ -376,9 +385,25 @@ public class GameMaster : MonoBehaviour
 
     //This is called by tiles when they are done with their slide animation, so characters can start walking
     //It may eventually need to count how many tiles are done and wait for them all.
-    public void doneSliding()
+    public bool doneSliding()
     {
-        tilesSliding = false;
+        int numTiles = numCols * numRows;
+        int idleCount = 0;
+        foreach(GameObject tile in tiles)
+        {
+            if(tile.GetComponent<TileFSM>().fsm.CurrentStateID == StateID.Idle)
+            {
+                ++idleCount;
+            }
+        }
+        if(idleCount == numTiles)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
     //This is called by actors when they are done moving, and lets the player swipe a new move
     //It may need to eventually count how many actors are done, and wait for them all
@@ -521,6 +546,7 @@ public class GameMaster : MonoBehaviour
 				string currentTileType = row [c];
 				//instantiate a tile at the proper grid position
 				tileGrid [c] [r] = Instantiate (Tile, new Vector3 (c * tileSize, r * tileSize, 0), Quaternion.identity);
+                tiles.Add(tileGrid[c][r]);
 				// pass the tile object the type indicator string where it will
 				// create a tile based on that string
 				tileGrid [c] [r].SendMessage ("setTile", currentTileType);
